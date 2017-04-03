@@ -6,11 +6,11 @@
     <script src="thimblerig.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body onload="initialize()">
 <div id="content">
     <div id="header"></div>
     <div id="game">
-        <button onclick="initialize()">Go!</button><button onclick="move()">Move</button><br>
+        <button onclick="move()">Move</button><br>
         <canvas id="canvas" width="1300" height="800"></canvas>
     </div>
 </div>
