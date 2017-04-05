@@ -1,0 +1,18 @@
+.button {
+    font-size: 18px;
+    border: 2px solid black;
+    border-radius: 5px;
+    width: 150px;
+    height: 50px;
+    margin: 5px;
+}
+
+#content{
+    width: 1315px;
+    margin: auto;
+}
+
+#controls{
+    width: 150px;
+    margin: auto;
+}

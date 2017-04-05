@@ -3,6 +3,8 @@
  */
 let canvas;
 let canvasContext;
+let thimbleImage;
+let ballImage;
 
 let thimble1;
 let thimble2;
@@ -10,17 +12,25 @@ let thimble3;
 
 let executingSwaps = false;
 
+let defaultSpeed = 1;
+
 function initialize() {
     canvas = document.getElementById("canvas");
     canvasContext = canvas.getContext("2d");
-    thimble1 = new Thimble(100, 400, false, "#000000");
-    thimble2 = new Thimble(500, 400, true, "#000000");
-    thimble3 = new Thimble(900, 400, false, "#000000");
+    thimbleImage = document.getElementById("thimbleImage");
+    ballImage = document.getElementById("ballImage");
+}
+
+function startNewGame() {
+    thimble1 = new Thimble(100, 60, false);
+    thimble2 = new Thimble(500, 60, true);
+    thimble3 = new Thimble(900, 60, false);
+    thimble2.raise()
     updateCanvas();
 }
 
 function updateCanvas() {
-    canvasContext.clearRect(0, 0, 1300, 800);
+    canvasContext.clearRect(0, 0, 1300, 500);
     thimble1.draw();
     thimble2.draw();
     thimble3.draw();
@@ -31,8 +41,8 @@ function getRandomInt(min, max) {
 }
 
 function mix(swapsCount, speed) {
-    var i = 0;
-    var swapExecutor = setInterval(function () {
+    let i = 0;
+    let swapExecutor = setInterval(function () {
         if (!executingSwaps) {
             switch (getRandomInt(1, 4)) {
                 case 1: {
@@ -60,103 +70,101 @@ function mix(swapsCount, speed) {
 
 function move() {
     if (!executingSwaps) {
-        mix(10, 2);
+        if (thimble2.risen) {
+            thimble2.lower();
+        }
+        mix(5, defaultSpeed);
     }
 }
 
-function Thimble(leftBotX, leftBotY, ballIsHere, color) {
+function Thimble(x, y, ballIsHere) {
 
-    this.xPos = leftBotX;
-    this.yPos = leftBotY;
-    this.topWidth = 170;
-    this.bottomWidth = 300;
-    this.height = 250;
+    this.x = x;
+    this.y = y;
     this.containsBall = ballIsHere;
+    this.risen = false;
 
     this.draw = function () {
+        canvasContext.drawImage(thimbleImage, this.x, this.y);
+        if (this.containsBall && this.risen) {
+            canvasContext.drawImage(ballImage, this.x + thimbleImage.width / 2 - ballImage.width / 2, this.y + thimbleImage.height - 25);
+        }
+    };
 
-        canvasContext.fillStyle = "#FF0000";
-        canvasContext.beginPath();
-        canvasContext.moveTo(this.xPos, this.yPos);
-        canvasContext.arcTo(this.xPos + this.bottomWidth / 2, this.yPos + 45, this.xPos + this.bottomWidth, this.yPos, 520);
+    this.raise = function () {
+        if (!this.risen) {
+            this.changePosition(this.x, this.y - 50);
+            this.risen = true;
+        }
+    };
 
-        canvasContext.moveTo(this.xPos + (this.bottomWidth - this.topWidth) / 2 + this.topWidth, this.yPos - this.height);
-        canvasContext.arcTo(this.xPos + (this.bottomWidth - this.topWidth) / 2 + this.topWidth / 2, this.yPos - this.height + 25, this.xPos + (this.bottomWidth - this.topWidth) / 2, this.yPos - this.height, 300);
-
-        canvasContext.fill();
-
-        canvasContext.beginPath();
-        canvasContext.moveTo(this.xPos + this.bottomWidth, this.yPos);
-        canvasContext.lineTo(this.xPos + (this.bottomWidth - this.topWidth) / 2 + this.topWidth, this.yPos - this.height);
-
-        canvasContext.moveTo(this.xPos, this.yPos);
-        canvasContext.lineTo(this.xPos + this.bottomWidth, this.yPos);
-
-        canvasContext.moveTo(this.xPos + (this.bottomWidth - this.topWidth) / 2, this.yPos - this.height);
-        canvasContext.lineTo(this.xPos + (this.bottomWidth - this.topWidth) / 2 + this.topWidth, this.yPos - this.height);
-
-        canvasContext.moveTo(this.xPos, this.yPos);
-        canvasContext.lineTo(this.xPos + (this.bottomWidth - this.topWidth) / 2, this.yPos - this.height);
-
-        canvasContext.fill;
-
-        canvasContext.strokeStyle = color;
-        canvasContext.beginPath();
-
-        canvasContext.moveTo(this.xPos, this.yPos);
-        canvasContext.arcTo(this.xPos + this.bottomWidth / 2, this.yPos + 45, this.xPos + this.bottomWidth, this.yPos, 520);
-
-        canvasContext.moveTo(this.xPos + this.bottomWidth, this.yPos);
-        canvasContext.lineTo(this.xPos + (this.bottomWidth - this.topWidth) / 2 + this.topWidth, this.yPos - this.height);
-
-        canvasContext.moveTo(this.xPos + (this.bottomWidth - this.topWidth) / 2, this.yPos - this.height);
-        canvasContext.arcTo(this.xPos + (this.bottomWidth - this.topWidth) / 2 + this.topWidth / 2, this.yPos - this.height - 25, this.xPos + (this.bottomWidth - this.topWidth) / 2 + this.topWidth, this.yPos - this.height, 300);
-
-        canvasContext.moveTo(this.xPos, this.yPos);
-        canvasContext.lineTo(this.xPos + (this.bottomWidth - this.topWidth) / 2, this.yPos - this.height);
-
-        canvasContext.moveTo(this.xPos + (this.bottomWidth - this.topWidth) / 2 + this.topWidth, this.yPos - this.height);
-        canvasContext.arcTo(this.xPos + (this.bottomWidth - this.topWidth) / 2 + this.topWidth / 2, this.yPos - this.height + 25, this.xPos + (this.bottomWidth - this.topWidth) / 2, this.yPos - this.height, 300);
-
-        canvasContext.stroke();
-
-
+    this.lower = function () {
+        if (this.risen) {
+            this.changePosition(this.x, this.y + 50);
+            this.draw();
+            this.risen = false;
+        }
     };
 
     this.changePosition = function (newX, newY) {
-        this.xPos = newX;
-        this.yPos = newY;
+        this.x = newX;
+        this.y = newY;
     };
 
     this.getX = function () {
-        return this.xPos;
+        return this.x;
     };
 
     this.getY = function () {
-        return this.yPos;
+        return this.y;
     };
 
+    this.checkClickBox = function (x, y) {
+        return (x >= this.x && x <= this.x + thimbleImage.width
+        && y >= this.y && y <= this.y + thimbleImage.height)
+    };
 }
 
 function swapThimbles(thimble1, thimble2, speedMult) {
     let x1 = thimble1.getX();
     let x2 = thimble2.getX();
 
-    var interval = setInterval(
+    let interval = setInterval(
         function () {
             executingSwaps = true;
             if (x1 > x2) {
-                thimble1.xPos -= 10 * speedMult;
-                thimble2.xPos += 10 * speedMult;
+                thimble1.x -= 10 * speedMult;
+                thimble2.x += 10 * speedMult;
             } else {
-                thimble1.xPos += 10 * speedMult;
-                thimble2.xPos -= 10 * speedMult;
+                thimble1.x += 10 * speedMult;
+                thimble2.x -= 10 * speedMult;
             }
             updateCanvas();
-            if (thimble2.xPos === x1) {
+            if (thimble2.x === x1) {
                 clearInterval(interval);
                 executingSwaps = false;
                 console.log(typeof interval);
             }
         }, 10);
+}
+
+function processClick() {
+    if (!executingSwaps) {
+        var pageX = event.pageX;
+        var pageY = event.pageY;
+        let bodyRect = document.body.getBoundingClientRect();
+        let elemRect = canvas.getBoundingClientRect();
+        let offsetY = elemRect.top - bodyRect.top;
+        let offsetX = elemRect.left - bodyRect.left;
+        if (thimble1.checkClickBox(pageX - offsetX, pageY - offsetY)) {
+            thimble1.raise();
+            updateCanvas();
+        } else if (thimble2.checkClickBox(pageX - offsetX, pageY - offsetY)) {
+            thimble2.raise();
+            updateCanvas();
+        } else if (thimble3.checkClickBox(pageX - offsetX, pageY - offsetY)) {
+            thimble3.raise();
+            updateCanvas();
+        }
+    }
 }

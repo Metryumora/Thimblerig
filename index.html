@@ -10,8 +10,15 @@
 <div id="content">
     <div id="header"></div>
     <div id="game">
-        <button onclick="move()">Move</button><br>
-        <canvas id="canvas" width="1300" height="800"></canvas>
+        <img src="thimble.png" id="thimbleImage" hidden>
+        <img src="ball.png" id="ballImage" hidden>
+        <canvas id="canvas" width="1300" height="500" onclick="processClick(this)"></canvas>
+
+        <div id="controls">
+            <button class="button" onclick="startNewGame()">New Game</button>
+            <br>
+            <button class="button" onclick="move()">Start</button>
+        </div>
     </div>
 </div>
 </body>
